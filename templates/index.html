@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCheck Web - IMC</title>
+    <!-- Usando Bootstrap para deixar o design do site profissional e responsivo para celular -->
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <style>
+        body { background-color: #1e293b; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-custom { background-color: #0f172a; border: 1px solid #334155; border-radius: 15px; }
+        .form-control { background-color: #1e293b; border: 1px solid #334155; color: #ffffff; }
+        .form-control:focus { background-color: #1e293b; color: #ffffff; border-color: #0284c7; box-shadow: none; }
+    </style>
+</head>
+<body>
+    <div class="container d-flex flex-column align-items-center justify-content-center min-vh-100">
+        <h1 class="fw-bold text-center mb-1">HealthCheck Web</h1>
+        <p class="text-muted text-center mb-4">Calcule seu IMC direto do navegador</p>
+        
+        <div class="card card-custom p-4 w-100" style="max-width: 400px;">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Nome Completo</label>
+                    <input type="text" name="nome" class="form-control" placeholder="Ex: João Silva" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Peso Atual (kg)</label>
+                    <input type="text" name="peso" class="form-control" placeholder="Ex: 75.2" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Altura Atual (m)</label>
+                    <input type="text" name="altura" class="form-control" placeholder="Ex: 1.78" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2" style="background-color: #0284c7; border: none;">Calcular e Registrar</button>
+            </form>
+
+            {% if resultado %}
+                <div class="alert alert-{{ cor_classe }} mt-4 text-center fw-bold" role="alert">
+                    {{ resultado }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
