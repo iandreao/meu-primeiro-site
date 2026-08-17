@@ -4,43 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HealthCheck Web - IMC</title>
-    <!-- Usando Bootstrap para deixar o design do site profissional e responsivo para celular -->
-    <link href="https://jsdelivr.net" rel="stylesheet">
     <style>
-        body { background-color: #1e293b; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .card-custom { background-color: #0f172a; border: 1px solid #334155; border-radius: 15px; }
-        .form-control { background-color: #1e293b; border: 1px solid #334155; color: #ffffff; }
-        .form-control:focus { background-color: #1e293b; color: #ffffff; border-color: #0284c7; box-shadow: none; }
+        /* DESIGN TOTALMENTE EMBUTIDO - NÃO QUEBRA NO CELULAR */
+        body { 
+            background-color: #1e293b; 
+            color: #f8fafc; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 380px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h1 { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
+        .subtitulo { color: #94a3b8; font-size: 14px; margin-bottom: 25px; margin-top: 0; }
+        
+        .card-custom { 
+            background-color: #0f172a; 
+            border: 1px solid #334155; 
+            border-radius: 15px; 
+            padding: 25px;
+            text-align: left;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; font-weight: bold; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        
+        .form-control { 
+            width: 100%; 
+            background-color: #1e293b; 
+            border: 1px solid #334155; 
+            color: #ffffff; 
+            padding: 12px; 
+            border-radius: 8px; 
+            box-sizing: border-box;
+            font-size: 14px;
+            outline: none;
+        }
+        .form-control:focus { border-color: #0284c7; }
+        
+        .btn-custom { 
+            width: 100%; 
+            background-color: #0284c7; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 8px; 
+            font-size: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn-custom:hover { background-color: #0369a1; }
+
+        /* ALERTA DE RESULTADO */
+        .alert { padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center; font-weight: bold; font-size: 14px; }
+        .alert-success { background-color: #064e3b; color: #10b981; border: 1px solid #047857; }
+        .alert-warning { background-color: #78350f; color: #f59e0b; border: 1px solid #b45309; }
+        .alert-danger { background-color: #7f1d1d; color: #ef4444; border: 1px solid #b91c1c; }
+        
+        /* TELA DE CARREGAMENTO (LOADER) */
+        #loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(15, 23, 42, 0.96);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            width: 45px; height: 45px;
+            border: 5px solid #334155;
+            border-top: 5px solid #0284c7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loader-txt { font-size: 16px; font-weight: bold; margin: 0; }
+        .loader-subtxt { color: #64748b; font-size: 13px; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div class="container d-flex flex-column align-items-center justify-content-center min-vh-100">
-        <h1 class="fw-bold text-center mb-1">HealthCheck Web</h1>
-        <p class="text-muted text-center mb-4">Calcule seu IMC direto do navegador</p>
+
+    <!-- TELA DE CARREGAMENTO -->
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+        <p class="loader-txt">Processando dados...</p>
+        <p class="loader-subtxt">Aguarde um instante</p>
+    </div>
+
+    <!-- CONTEÚDO DO SITE -->
+    <div class="container">
+        <h1>HealthCheck Web</h1>
+        <p class="subtitulo">Calcule seu IMC direto do navegador</p>
         
-        <div class="card card-custom p-4 w-100" style="max-width: 400px;">
-            <form method="POST">
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-secondary">Nome Completo</label>
+        <div class="card card-custom">
+            <form method="POST" onsubmit="mostrarLoader()">
+                <div class="form-group">
+                    <label>Nome Completo</label>
                     <input type="text" name="nome" class="form-control" placeholder="Ex: João Silva" required>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-secondary">Peso Atual (kg)</label>
+                <div class="form-group">
+                    <label>Peso Atual (kg)</label>
                     <input type="text" name="peso" class="form-control" placeholder="Ex: 75.2" required>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-bold text-secondary">Altura Atual (m)</label>
+                <div class="form-group">
+                    <label>Altura Atual (m)</label>
                     <input type="text" name="altura" class="form-control" placeholder="Ex: 1.78" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2" style="background-color: #0284c7; border: none;">Calcular e Registrar</button>
+                <button type="submit" class="btn-custom">Calcular e Registrar</button>
             </form>
 
             {% if resultado %}
-                <div class="alert alert-{{ cor_classe }} mt-4 text-center fw-bold" role="alert">
+                <!-- Define a cor profissional do alerta baseado no resultado do Python -->
+                <div class="alert {% if cor_classe == 'success' %}alert-success{% elif cor_classe == 'warning' %}alert-warning{% else %}alert-danger{% endif %}">
                     {{ resultado }}
                 </div>
             {% endif %}
         </div>
     </div>
+
+    <script>
+        function mostrarLoader() {
+            document.getElementById("loader-overlay").style.display = "flex";
+        }
+    </script>
 </body>
 </html>
+
