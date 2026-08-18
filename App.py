@@ -1,11 +1,7 @@
 from flask import Flask, render_template_string, request
-from datetime import datetime
-import os
 
 app = Flask(__name__)
-NOME_ARQUIVO = "historico_web.csv"
 
-# Modelo HTML integrado com o tema escuro e as caixas brancas requisitadas
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -20,19 +16,7 @@ HTML_TEMPLATE = """
         .card { background-color: #243145; padding: 30px; border-radius: 8px; text-align: left; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; color: #8a99ad; font-weight: bold; }
-        
-        /* BOXES DE ENTRADA BRANCOS */
-        input[type="text"] { 
-            width: 100%; 
-            padding: 12px; 
-            box-sizing: border-box; 
-            background-color: #ffffff !important; 
-            color: #000000 !important; 
-            border: 1px solid #ccc; 
-            border-radius: 6px; 
-            font-size: 14px;
-        }
-        
+        input[type="text"] { width: 100%; padding: 12px; box-sizing: border-box; background-color: #ffffff !important; color: #000000 !important; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         button { background-color: #0081cb; color: white; padding: 14px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; font-weight: bold; margin-top: 10px; }
         button:hover { background-color: #006dab; }
         .alert { padding: 12px; margin-top: 20px; border-radius: 6px; font-weight: bold; text-align: center; font-size: 14px; }
@@ -42,10 +26,8 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
-
     <h1>HealthCheck Web</h1>
     <p>Calcular o IMC direto na Web</p>
-
     <div class="card">
         <form method="POST">
             <div class="form-group">
@@ -62,14 +44,12 @@ HTML_TEMPLATE = """
             </div>
             <button type="submit">Calcular e Registrar</button>
         </form>
-
         {% if resultado %}
             <div class="alert {{ cor_classe }}">
                 {{ resultado }}
             </div>
         {% endif %}
     </div>
-
 </body>
 </html>
 """
@@ -78,19 +58,15 @@ HTML_TEMPLATE = """
 def home():
     resultado = None
     cor_classe = ""
-    
     if request.method == "POST":
         nome = request.form.get("nome")
         peso_txt = request.form.get("peso")
         altura_txt = request.form.get("altura")
-        
         if nome and peso_txt and altura_txt:
             try:
                 peso = float(peso_txt.replace(",", "."))
                 altura = float(altura_txt.replace(",", "."))
                 imc = peso / (altura * altura)
-                data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
-                
                 if imc < 18.5:
                     classificacao = "Abaixo do peso"
                     cor_classe = "warning"
@@ -100,22 +76,14 @@ def home():
                 else:
                     classificacao = "Acima do peso"
                     cor_classe = "danger"
-                
                 resultado = f"Olá {nome}! Seu IMC é {imc:.2f} ({classificacao})"
-                
-                if not os.path.exists(NOME_ARQUIVO):
-                    with open(NOME_ARQUIVO, "w", encoding="utf-8") as f:
-                        f.write("Data;Nome;Peso;Altura;IMC;Classificacao\n")
-                        
-                with open(NOME_ARQUIVO, "a", encoding="utf-8") as f:
-                    f.write(f"{data_atual};{nome};{peso};{altura};{imc:.2f};{classificacao}\n")
-                    
             except ValueError:
                 resultado = "Erro: Digite apenas números válidos!"
                 cor_classe = "danger"
-
     return render_template_string(HTML_TEMPLATE, resultado=resultado, cor_classe=cor_classe)
 
 if __name__ == "__main__":
+    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
