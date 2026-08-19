@@ -26,7 +26,7 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
-    <h1>HealthCheck Web</h1>
+    <h1>Check Saúde Web</h1>
     <p>Calcular o IMC direto na Web</p>
     <div class="card">
         <form method="POST">
